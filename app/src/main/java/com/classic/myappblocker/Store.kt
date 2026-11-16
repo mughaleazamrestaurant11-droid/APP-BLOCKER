@@ -37,4 +37,10 @@ object Store {
     fun setTipsSeen(context: Context, value: Boolean) {
         prefs(context).edit().putBoolean("tipsSeen", value).apply()
     }
+
+    fun fingerprintLock(context: Context): Boolean = prefs(context).getBoolean("fingerprint", false)
+
+    fun setFingerprintLock(context: Context, value: Boolean) {
+        prefs(context).edit().putBoolean("fingerprint", value).apply()
+    }
 }

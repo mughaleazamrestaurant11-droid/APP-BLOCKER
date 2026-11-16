@@ -2,23 +2,30 @@ package com.classic.myappblocker
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.hardware.biometrics.BiometricManager
+import android.hardware.biometrics.BiometricPrompt
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.net.Uri
 import android.net.VpnService
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.os.CancellationSignal
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ListView
 import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
+import org.json.JSONObject
 
 class MainActivity : Activity() {
 
@@ -26,11 +33,13 @@ class MainActivity : Activity() {
     private lateinit var master: Switch
     private lateinit var status: TextView
     private var uiBusy = false
+    private var locked = false
     private val handler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        maybeLock()
 
         master = findViewById(R.id.switch_master)
         status = findViewById(R.id.text_status)
@@ -76,6 +85,27 @@ class MainActivity : Activity() {
             ).show()
         }
         maybeShowTips()
+
+        val tiktok = findViewById<Button>(R.id.btn_tiktok)
+        tiktok.setOnClickListener {
+            startActivity(Intent(this, TikTokDownloaderActivity::class.java))
+        }
+        findViewById<Button>(R.id.btn_backup).setOnClickListener { backup() }
+        findViewById<Button>(R.id.btn_restore).setOnClickListener { restore() }
+        val fp = findViewById<Switch>(R.id.switch_fingerprint)
+        if (Build.VERSION.SDK_INT >= 28) {
+            fp.isChecked = Store.fingerprintLock(this)
+            fp.setOnCheckedChangeListener { _, b ->
+                Store.setFingerprintLock(this, b)
+                Toast.makeText(
+                    this,
+                    if (b) "Fingerprint lock enabled" else "Fingerprint lock disabled",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        } else {
+            fp.visibility = View.GONE
+        }
 
         master.setOnCheckedChangeListener { _, on ->
             if (!uiBusy) {
@@ -157,6 +187,117 @@ class MainActivity : Activity() {
                 Toast.makeText(this, "VPN permission denied", Toast.LENGTH_SHORT).show()
                 refreshUi()
             }
+            return
+        }
+        if (requestCode == REQUEST_BACKUP_SAVE && resultCode == RESULT_OK) {
+            val uri: Uri? = data?.data
+            if (uri != null) {
+                try {
+                    val obj = JSONObject()
+                    for (e in adapter.exportAll()) obj.put(e.pkg, e.flags)
+                    contentResolver.openOutputStream(uri)?.use { out ->
+                        out.write(obj.toString(2).toByteArray(Charsets.UTF_8))
+                        out.flush()
+                    }
+                    Toast.makeText(this, "Backup saved", Toast.LENGTH_SHORT).show()
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Backup failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+            return
+        }
+        if (requestCode == REQUEST_BACKUP_LOAD && resultCode == RESULT_OK) {
+            val uri: Uri? = data?.data
+            if (uri != null) {
+                try {
+                    val text = contentResolver.openInputStream(uri)?.bufferedReader()
+                        ?.use { it.readText() } ?: ""
+                    val obj = JSONObject(text)
+                    val keys = obj.keys()
+                    var count = 0
+                    while (keys.hasNext()) {
+                        val pkg = keys.next()
+                        Store.setFlags(this, pkg, obj.optInt(pkg, 0))
+                        count++
+                    }
+                    adapter.reload()
+                    refreshVpn(this)
+                    refreshUi()
+                    Toast.makeText(this, "Restored $count entries", Toast.LENGTH_SHORT).show()
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Restore failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+            return
+        }
+    }
+
+    private fun backup() {
+        try {
+            @Suppress("DEPRECATION")
+            startActivityForResult(
+                Intent(Intent.ACTION_CREATE_DOCUMENT)
+                    .addCategory(Intent.CATEGORY_OPENABLE)
+                    .setType("application/json")
+                    .putExtra(Intent.EXTRA_TITLE, "appblocker_backup.json"),
+                REQUEST_BACKUP_SAVE
+            )
+        } catch (e: Exception) {
+            Toast.makeText(this, "No file picker available", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun restore() {
+        try {
+            @Suppress("DEPRECATION")
+            startActivityForResult(
+                Intent(Intent.ACTION_OPEN_DOCUMENT)
+                    .addCategory(Intent.CATEGORY_OPENABLE)
+                    .setType("*/*"),
+                REQUEST_BACKUP_LOAD
+            )
+        } catch (e: Exception) {
+            Toast.makeText(this, "No file picker available", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun maybeLock() {
+        if (Build.VERSION.SDK_INT < 28) return
+        if (!Store.fingerprintLock(this)) return
+        if (Build.VERSION.SDK_INT >= 30) {
+            val bm = getSystemService(BiometricManager::class.java)
+            if (bm.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK)
+                != BiometricManager.BIOMETRIC_SUCCESS
+            ) {
+                return // no fingerprint enrolled - do not lock the user out
+            }
+        }
+        try {
+            val prompt = BiometricPrompt.Builder(this)
+                .setTitle("App Blocker locked")
+                .setSubtitle("Use your fingerprint to continue")
+                .setNegativeButtonText("Cancel")
+                .build()
+            locked = true
+            prompt.authenticate(CancellationSignal(), mainExecutor, authCallback)
+        } catch (e: Exception) {
+            locked = false
+        }
+    }
+
+    private val authCallback = object : BiometricPrompt.AuthenticationCallback() {
+        override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult?) {
+            locked = false
+        }
+
+        override fun onAuthenticationError(code: Int, errString: CharSequence?) {
+            if (code == 5 || code == 10) {
+                // User cancelled - close the app.
+                finish()
+            } else {
+                // No biometrics available - allow access.
+                locked = false
+            }
         }
     }
 
@@ -227,6 +368,8 @@ class MainActivity : Activity() {
 
     companion object {
         private const val REQUEST_VPN = 1
+        private const val REQUEST_BACKUP_SAVE = 10
+        private const val REQUEST_BACKUP_LOAD = 11
 
         /** Tell the running service to rebuild its rules after a change. */
         fun refreshVpn(context: Context) {

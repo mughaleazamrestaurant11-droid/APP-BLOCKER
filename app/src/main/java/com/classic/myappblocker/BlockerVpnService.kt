@@ -50,8 +50,7 @@ class BlockerVpnService : VpnService() {
         (getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
             .createNotificationChannel(channel)
 
-        callback = object : ConnectivityManager.NetworkCallback() {
-            override fun onAvailable(network: Network) {
+        callback = object : ConnectivityManager.NetworkCallback() {            override fun onAvailable(network: Network) {
                 scheduleRebuild()
             }
 
@@ -74,6 +73,7 @@ class BlockerVpnService : VpnService() {
             Log.w(TAG, "network callback failed", e)
             callback = null
         }
+        ToggleWidget.poke(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -241,6 +241,7 @@ class BlockerVpnService : VpnService() {
             }
         }
         callback = null
+        ToggleWidget.poke(this)
         super.onDestroy()
     }
 

@@ -52,6 +52,10 @@ git push -u origin main
 - **Block all / Allow all** buttons — bulk control in one tap.
 - **"Blocked only"** switch — show just the blocked apps.
 - **Auto-block new apps** switch — every app you install in the future gets blocked automatically.
+- **Backup / Restore** buttons — save your blocked list to a JSON file and restore it later (great for switching phones).
+- **Fingerprint lock** switch — opening the app requires your fingerprint (fingerprint-only, Android 9+).
+- **TikTok downloader** — paste any TikTok link inside the app and download the video **without watermark** (via the free public tikwm.com API) into `Downloads/MyAppBlocker`.
+- **Home-screen widget** — long-press your launcher → Widgets → "App Blocker" → a one-tap ON/OFF widget.
 - **Quick Settings tile** — add the "App Blocker" tile (edit your quick settings panel) for one-tap on/off without opening the app.
 - **Auto-start after reboot** — the blocker re-arms itself when the phone restarts.
 - **Dark mode** — follows your phone's dark/light theme automatically.

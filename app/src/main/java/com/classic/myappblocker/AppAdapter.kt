@@ -87,6 +87,9 @@ class AppAdapter(
 
     fun blockedCount(): Int = all.count { it.flags != 0 }
 
+    /** Copy of the full list, used for backup export. */
+    fun exportAll(): List<AppEntry> = ArrayList(all)
+
     private fun hasInternetPermission(info: PackageInfo): Boolean {
         val requested = info.requestedPermissions ?: return false
         for (p in requested) {

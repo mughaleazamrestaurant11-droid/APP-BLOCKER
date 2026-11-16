@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
 
     <application
         android:allowBackup="true"
@@ -62,5 +63,22 @@
                 <data android:scheme="package"/>
             </intent-filter>
         </receiver>
+
+        <receiver
+            android:name=".ToggleWidget"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="com.classic.myappblocker.WIDGET_TOGGLE"/>
+                <action android:name="com.classic.myappblocker.WIDGET_REFRESH"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/toggle_widget_info"/>
+        </receiver>
+
+        <activity
+            android:name=".TikTokDownloaderActivity"
+            android:exported="false"/>
     </application>
 </manifest>
