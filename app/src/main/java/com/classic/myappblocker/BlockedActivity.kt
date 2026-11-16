@@ -16,16 +16,6 @@ class BlockedActivity : Activity() {
         val pkg = intent?.getStringExtra(EXTRA_PKG) ?: ""
         findViewById<TextView>(R.id.blocked_name).text = labelFor(pkg)
 
-        findViewById<Button>(R.id.btn_open_here).setOnClickListener {
-            LaunchGuardService.allow(pkg, 60_000)
-            val launch = packageManager.getLaunchIntentForPackage(pkg)
-            if (launch != null) {
-                launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(launch)
-            }
-            finish()
-        }
-
         findViewById<Button>(R.id.btn_home).setOnClickListener {
             try {
                 startActivity(
