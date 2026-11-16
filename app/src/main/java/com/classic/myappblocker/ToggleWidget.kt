@@ -6,10 +6,9 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.net.VpnService
 import android.widget.RemoteViews
 
-/** Home screen widget: one tap toggles the firewall. */
+/** Home screen widget: one tap toggles Launch Guard (app open blocking). */
 class ToggleWidget : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
@@ -28,46 +27,29 @@ class ToggleWidget : AppWidgetProvider() {
     }
 
     private fun toggle(context: Context) {
-        if (BlockerVpnService.isRunning) {
-            Store.setEnabled(context, false)
+        val now = !Store.openGuardEnabled(context)
+        Store.setOpenGuardEnabled(context, now)
+        if (now && !LaunchGuardService.isServiceEnabled(context)) {
+            // Open the settings screen so the user can enable the service.
             try {
-                context.startService(
-                    Intent(context, BlockerVpnService::class.java).setAction(BlockerVpnService.ACTION_STOP)
+                context.startActivity(
+                    Intent(context, SettingsActivity::class.java)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 )
             } catch (e: Exception) {
                 // ignore
-            }
-        } else {
-            if (Store.enabled(context) || VpnService.prepare(context) == null) {
-                Store.setEnabled(context, true)
-                try {
-                    context.startForegroundService(
-                        Intent(context, BlockerVpnService::class.java).setAction(BlockerVpnService.ACTION_START)
-                    )
-                } catch (e: Exception) {
-                    // ignore
-                }
-            } else {
-                // VPN permission not granted yet - open the app.
-                try {
-                    context.startActivity(
-                        Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    )
-                } catch (e: Exception) {
-                    // ignore
-                }
             }
         }
     }
 
     private fun refresh(context: Context) {
         val manager = AppWidgetManager.getInstance(context) ?: return
-        val running = BlockerVpnService.isRunning
+        val on = Store.openGuardEnabled(context)
         val views = RemoteViews(context.packageName, R.layout.widget_toggle)
-        views.setTextViewText(R.id.widget_text, if (running) "Blocker ON" else "Blocker OFF")
+        views.setTextViewText(R.id.widget_text, if (on) "Guard ON" else "Guard OFF")
         views.setInt(
             R.id.widget_text, "setBackgroundResource",
-            if (running) R.drawable.widget_bg_on else R.drawable.widget_bg_off
+            if (on) R.drawable.widget_bg_on else R.drawable.widget_bg_off
         )
         views.setOnClickPendingIntent(
             R.id.widget_text,

@@ -1,22 +1,17 @@
 # My App Blocker (Kotlin)
 
-A personal Android app with **two protections in one**:
-
-1. **Internet blocker** — cut the internet connection of any app, separately for Wi‑Fi and mobile data (local VPN, no root).
-2. **Launch Guard (app open blocker)** — apps marked "Opening blocked" are covered with a lock screen whenever they are opened normally; they can only be opened from inside My App Blocker.
-
-Plus: TikTok video downloader (no watermark, via the free public tikwm.com API), fingerprint lock, home-screen widget, quick-settings tile, auto-block new apps, boot auto-start, backup/restore, and a clean multi-page UI (Dashboard / Apps / Settings) with dark mode.
+A personal Android app that **blocks apps from opening** — with a full-screen lock cover and a clean multi-page UI (Dashboard / Apps / Settings), dark mode, TikTok downloader, fingerprint lock and more.
 
 ## How it works
 
-The app runs a **local VPN service** (Android's built-in `VpnService` — no actual data leaves your phone):
+**Launch Guard (app open blocker):**
 
-- Only the apps you block are routed into the VPN tunnel.
-- The tunnel simply drops their packets → no internet, no DNS, nothing loads.
-- All other apps (and system services) bypass the VPN and run at full speed.
-- Switching between Wi‑Fi and mobile data rebuilds the rules automatically.
+1. You mark an app as **blocked** in the Apps page.
+2. An accessibility service ("App Blocker Launch Guard") watches which app comes to the foreground.
+3. The moment a blocked app is opened normally (launcher, recents, another app…), it is covered with a dark **"App blocked"** screen.
+4. The only ways past the cover are **"Open from App Blocker"** (a 1-minute bypass) or unblocking the app in My App Blocker — so a blocked app effectively only opens from inside this app.
 
-Your phone shows the standard Android "VPN connected" key while it runs. Nothing is uploaded anywhere — this is a firewall, not a proxy.
+No VPN, no root, no special permissions — just the accessibility service you enable once.
 
 ## Build the APK on GitHub (no Android Studio needed)
 
@@ -43,38 +38,32 @@ git push -u origin main
 ## Install on your phone
 
 1. Copy `app-debug.apk` to your phone (USB, WhatsApp to yourself, Drive, etc.).
-2. Tap it → allow "Install unknown apps" if asked → install.
-3. Open **My App Blocker** and flip the top switch ON.
-4. Android will ask for **VPN permission** → tap **OK**. That's the only permission you'll see.
-5. You now see every app that has internet permission. Tap a switch to block it.
+2. Tap it → allow "Install unknown apps" if asked → install (if Play Protect shows a warning, tap "More details" → press-and-hold "Install anyway").
+3. Open **My App Blocker** → **Settings** → **Block apps from opening** → flip the switch ON.
+4. Tap **Enable in Accessibility settings** and turn on **"App Blocker Launch Guard"**. One-time setup — done.
 
 ## Using it
 
-- **Dashboard** — the big switch starts/stops the internet blocker; two counters show how many apps have internet blocked vs opening blocked.
-- **Apps & blocking page** — per-app **Block** switch (blocks everything), and:
-  - **Long-press an app** to choose: Wi‑Fi only / data only / **opening only** / everything / allow.
-  - **"Open now (1 min bypass)"** appears for opening-blocked apps — the only way to open them normally.
-- **Launch Guard setup** (Settings → Block apps from opening): flip the switch, then enable **"App Blocker Launch Guard"** in the Accessibility settings screen. From then on, blocked apps get covered with a dark "App blocked" screen the moment they open.
-- **Search box** — filter the list by name or package.
-- **Block all / Allow all** buttons — bulk control in one tap.
-- **"Blocked only"** switch — show just the restricted apps.
-- **Auto-block new apps** switch — every app you install in the future gets blocked automatically.
-- **Backup / Restore** — save/restore your block list as a JSON file (Settings → Your data).
-- **Fingerprint lock** switch — opening the app requires your fingerprint (fingerprint-only, Android 9+).
+- **Dashboard** — the Launch Guard switch, live status ("Active — N app(s) protected"), the count of apps that only open from here, and the menu (Apps / TikTok downloader / Settings).
+- **Apps & blocking page** — per-app **Block** switch (blocks that app from opening):
+  - **Long-press an app** to choose Allow / Block opening, or **"Open now (1 min bypass)"** for blocked apps.
+  - **Search box** — filter the list by name or package.
+  - **Block all / Allow all** buttons — bulk control in one tap.
+  - **"Blocked only"** switch — show just the blocked apps.
+- **Blocked cover screen** — shows the app name, with **"Open from App Blocker"** (60-second bypass) and **"Go home"**.
+- **Auto-block new apps** switch (Settings) — every app you install in the future gets blocked automatically.
+- **Backup / Restore** — save/restore your block list as a JSON file (Settings → Your data), great when changing phones.
+- **Fingerprint lock** switch — opening this app requires your fingerprint (Android 9+).
 - **TikTok downloader** — paste any TikTok link and download the video **without watermark** into `Downloads/MyAppBlocker`.
-- **Home-screen widget** — long-press your launcher → Widgets → "App Blocker" → a one-tap ON/OFF widget.
+- **Home-screen widget** — long-press your launcher → Widgets → "App Blocker" → a one-tap **Guard ON/OFF** widget.
 - **Quick Settings tile** — add the "App Blocker" tile for one-tap on/off without opening the app.
-- **Auto-start after reboot** — the internet blocker re-arms itself when the phone restarts.
 - **Dark mode** — follows your phone's dark/light theme automatically.
-- While blocking, the small **key icon** in the status bar (drawn by Android itself) shows the VPN is active — that one can't be removed by any app.
-- The app's own notification is **silent, minimized and hidden from the lockscreen**; on Android 13+ it isn't shown at all.
 
 ## Important notes
 
-- **Only one VPN can run at a time.** If NetGuard, AdGuard, Windscribe, etc. are on, turn them off (or use them for this instead 🙂).
-- Blocking stays on until you turn it off in the app or via the notification. After a phone **reboot**, open the app once — it restarts automatically.
-- A blocked app won't show errors immediately; it just hangs/times out (no data flows). Unblock to restore it instantly.
-- Careful blocking system components like `com.android.vending` (Play Store) or Google Play Services — some things on the phone may misbehave.
+- The accessibility service must stay enabled; Android may disable it on some devices after an update — the Settings page shows live **ACTIVE/OFF** status so you can re-enable it.
+- The 1-minute bypass exists so a legitimately opened app isn't trapped mid-use; the block re-arms on the next launch.
+- Android doesn't let a normal app *prevent* another app from launching — covering it instantly is exactly how commercial AppLock/blocker apps work.
 - The "release" artifact is unsigned and can't be installed directly — use the **debug** APK.
 
 ## Project structure
@@ -88,16 +77,21 @@ MyAppBlocker/
     └── src/main/
         ├── AndroidManifest.xml
         ├── java/com/classic/myappblocker/
-        │   ├── MainActivity.kt      ← UI: app list + switches
-        │   ├── AppAdapter.kt        ← list adapter + search
+        │   ├── MainActivity.kt          ← dashboard (status, switch, menu)
+        │   ├── AppsActivity.kt          ← app list + per-app blocks
+        │   ├── AppAdapter.kt            ← list adapter + search
         │   ├── AppEntry.kt
-        │   ├── Store.kt             ← saved settings
-        │   └── BlockerVpnService.kt ← the actual firewall (VPN)
-        └── res/                     ← layouts, icons, strings
+        │   ├── Store.kt                 ← saved settings
+        │   ├── LaunchGuardService.kt    ← the actual open blocker
+        │   ├── BlockedActivity.kt       ← full-screen "App blocked" cover
+        │   ├── SettingsActivity.kt      ← guard, fingerprint, backup
+        │   ├── TikTokDownloaderActivity.kt
+        │   ├── BlockerTileService.kt    ← quick settings tile
+        │   └── ToggleWidget.kt          ← home-screen widget
+        └── res/                         ← layouts, icons, strings
 ```
 
 ## Requirements
 
 - Android 8.0+ (API 26)
 - Built with AGP 8.5.2 / Kotlin 2.0.21 / Gradle 8.7 (handled by the GitHub workflow)
-"# APP-BLOCKER" 

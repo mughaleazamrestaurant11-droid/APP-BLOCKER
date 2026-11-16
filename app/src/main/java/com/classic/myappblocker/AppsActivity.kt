@@ -13,7 +13,7 @@ import android.widget.ListView
 import android.widget.Switch
 import android.widget.TextView
 
-/** The app list: per-app internet / opening blocks. */
+/** The app list: per-app opening blocks (Launch Guard). */
 class AppsActivity : Activity() {
 
     private lateinit var adapter: AppAdapter
@@ -46,12 +46,10 @@ class AppsActivity : Activity() {
 
         findViewById<Button>(R.id.btn_block_all).setOnClickListener {
             adapter.blockAll()
-            MainActivity.refreshVpn(this)
             refreshFooter()
         }
         findViewById<Button>(R.id.btn_allow_all).setOnClickListener {
             adapter.allowAll()
-            MainActivity.refreshVpn(this)
             refreshFooter()
         }
         findViewById<Switch>(R.id.switch_blocked_only).setOnCheckedChangeListener { _, b ->
@@ -68,43 +66,27 @@ class AppsActivity : Activity() {
 
     private fun refreshFooter() {
         status.text =
-            "Showing ${adapter.shownCount()} of ${adapter.totalCount()} apps - ${adapter.blockedCount()} restricted"
+            "Showing ${adapter.shownCount()} of ${adapter.totalCount()} apps - ${adapter.blockedCount()} blocked from opening"
     }
 
     private fun showBlockDialog(app: AppEntry) {
         val options = arrayOf(
-            "Allow everything",
-            "Block Wi-Fi only",
-            "Block mobile data only",
-            "Block opening only (internet stays on)",
-            "Block everything (Wi-Fi + data + opening)"
+            "Allow opening",
+            "Block opening (only from this app)"
         )
-        val selected = when (app.flags) {
-            Store.BLOCK_WIFI -> 1
-            Store.BLOCK_DATA -> 2
-            Store.BLOCK_OPEN -> 3
-            Store.BLOCK_ALL -> 4
-            else -> 0
-        }
+        val selected = if (app.flags != 0) 1 else 0
         val dialog = AlertDialog.Builder(this)
             .setTitle(app.label)
             .setSingleChoiceItems(options, selected) { d, which ->
-                app.flags = when (which) {
-                    1 -> Store.BLOCK_WIFI
-                    2 -> Store.BLOCK_DATA
-                    3 -> Store.BLOCK_OPEN
-                    4 -> Store.BLOCK_ALL
-                    else -> 0
-                }
+                app.flags = if (which == 1) Store.BLOCK_ALL else 0
                 Store.setFlags(this, app.pkg, app.flags)
                 adapter.notifyDataSetChanged()
-                MainActivity.refreshVpn(this)
                 refreshFooter()
                 d.dismiss()
             }
             .setNegativeButton("Cancel", null)
 
-        if (app.flags and Store.BLOCK_OPEN != 0) {
+        if (app.flags != 0) {
             dialog.setNeutralButton("Open now (1 min bypass)") { _, _ ->
                 LaunchGuardService.allow(app.pkg, 60_000)
                 val launch = packageManager.getLaunchIntentForPackage(app.pkg)

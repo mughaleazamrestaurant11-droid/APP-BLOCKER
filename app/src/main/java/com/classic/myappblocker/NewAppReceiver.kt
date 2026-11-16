@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 
-/** Optionally blocks the internet of every newly installed app (when enabled in settings). */
+/** Optionally blocks the opening of every newly installed app (when enabled in settings). */
 class NewAppReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -13,6 +13,5 @@ class NewAppReceiver : BroadcastReceiver() {
         val pkg = intent.data?.schemeSpecificPart ?: return
         if (pkg == context.packageName) return
         Store.setFlags(context, pkg, Store.BLOCK_ALL)
-        MainActivity.refreshVpn(context)
     }
 }

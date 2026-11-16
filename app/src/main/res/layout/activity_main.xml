@@ -41,7 +41,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Protection"
+                        android:text="Launch Guard"
                         android:textColor="#FFFFFFFF"
                         android:textSize="18sp"
                         android:textStyle="bold"/>
@@ -56,73 +56,37 @@
                 </LinearLayout>
 
                 <Switch
-                    android:id="@+id/switch_master"
+                    android:id="@+id/switch_guard"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Counters -->
+        <!-- Counter -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="14dp"
-            android:baselineAligned="false"
-            android:orientation="horizontal">
+            android:background="@drawable/bg_card"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="14dp">
 
-            <LinearLayout
-                android:layout_width="0dp"
+            <TextView
+                android:id="@+id/text_count_open"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="6dp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_card"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="14dp">
+                android:text="0"
+                android:textColor="@color/primary"
+                android:textSize="22sp"
+                android:textStyle="bold"/>
 
-                <TextView
-                    android:id="@+id/text_count_internet"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textColor="@color/primary"
-                    android:textSize="22sp"
-                    android:textStyle="bold"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Internet blocked"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_card"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="14dp">
-
-                <TextView
-                    android:id="@+id/text_count_open"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textColor="@color/primary"
-                    android:textSize="22sp"
-                    android:textStyle="bold"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Opening blocked"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp"/>
-            </LinearLayout>
+                android:text="Apps that only open from here"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp"/>
         </LinearLayout>
 
         <!-- Menu -->
@@ -278,7 +242,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:paddingTop="18dp"
-            android:text="Works offline - nothing leaves your phone"
+            android:text="No VPN needed - nothing leaves your phone"
             android:textColor="@color/text_secondary"
             android:textSize="12sp"/>
     </LinearLayout>

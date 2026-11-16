@@ -135,18 +135,12 @@ class AppAdapter(
         block.setOnCheckedChangeListener { _, checked ->
             entry.flags = if (checked) Store.BLOCK_ALL else 0
             Store.setFlags(activity, entry.pkg, entry.flags)
-            MainActivity.refreshVpn(activity)
             onChanged?.invoke()
         }
         return view
     }
 
     private fun stateText(flags: Int): String {
-        if (flags == 0) return "Allowed"
-        val parts = ArrayList<String>()
-        if (flags and Store.BLOCK_WIFI != 0) parts.add("Wi-Fi")
-        if (flags and Store.BLOCK_DATA != 0) parts.add("Data")
-        if (flags and Store.BLOCK_OPEN != 0) parts.add("Opening")
-        return parts.joinToString(" + ") + " blocked"
+        return if (flags == 0) "Allowed" else "Opening blocked"
     }
 }
