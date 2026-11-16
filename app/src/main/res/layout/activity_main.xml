@@ -24,6 +24,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Internet blocker"
+                android:textColor="@color/text_main"
                 android:textSize="18sp"
                 android:textStyle="bold"/>
 
@@ -31,14 +32,71 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Blocks internet of selected apps via a local VPN"
-                android:textSize="12sp"
-                android:textColor="#8A000000"/>
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp"/>
         </LinearLayout>
 
         <Switch
             android:id="@+id/switch_master"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp">
+
+        <Button
+            android:id="@+id/btn_block_all"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:text="Block all"
+            android:textSize="13sp"/>
+
+        <Button
+            android:id="@+id/btn_allow_all"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:text="Allow all"
+            android:textSize="13sp"/>
+
+        <Switch
+            android:id="@+id/switch_blocked_only"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Blocked only"
+            android:textSize="13sp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <Switch
+            android:id="@+id/switch_auto_new"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Auto-block newly installed apps"
+            android:textSize="13sp"/>
     </LinearLayout>
 
     <EditText
@@ -59,8 +117,8 @@
         android:paddingEnd="16dp"
         android:paddingTop="4dp"
         android:text="Tap the switch to block an app. Long-press an app for Wi-Fi / data only."
-        android:textSize="12sp"
-        android:textColor="#8A000000"/>
+        android:textColor="@color/text_secondary"
+        android:textSize="12sp"/>
 
     <ListView
         android:id="@+id/list"
@@ -72,8 +130,9 @@
         android:id="@+id/text_status"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#EEEEEE"
+        android:background="@color/status_bg"
         android:padding="12dp"
         android:text="Off"
+        android:textColor="@color/text_main"
         android:textSize="13sp"/>
 </LinearLayout>

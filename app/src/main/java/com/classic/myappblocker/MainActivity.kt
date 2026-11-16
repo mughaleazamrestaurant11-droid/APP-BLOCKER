@@ -2,6 +2,8 @@ package com.classic.myappblocker
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.VpnService
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -11,6 +13,7 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ListView
 import android.widget.Switch
@@ -49,6 +52,31 @@ class MainActivity : Activity() {
             }
         })
 
+        findViewById<Button>(R.id.btn_block_all).setOnClickListener {
+            adapter.blockAll()
+            refreshVpn(this)
+            refreshUi()
+        }
+        findViewById<Button>(R.id.btn_allow_all).setOnClickListener {
+            adapter.allowAll()
+            refreshVpn(this)
+            refreshUi()
+        }
+        findViewById<Switch>(R.id.switch_blocked_only).setOnCheckedChangeListener { _, b ->
+            adapter.setBlockedOnly(b)
+        }
+        val autoNew = findViewById<Switch>(R.id.switch_auto_new)
+        autoNew.isChecked = Store.blockNewApps(this)
+        autoNew.setOnCheckedChangeListener { _, b ->
+            Store.setBlockNewApps(this, b)
+            Toast.makeText(
+                this,
+                if (b) "Newly installed apps will be blocked" else "Newly installed apps will be allowed",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+        maybeShowTips()
+
         master.setOnCheckedChangeListener { _, on ->
             if (!uiBusy) {
                 if (on) startFirewall() else stopFirewall()
@@ -77,7 +105,7 @@ class MainActivity : Activity() {
         master.isChecked = running
         uiBusy = false
         status.text = when {
-            running -> "Active - blocking internet for ${adapter.blockedCount()} app(s)"
+            running -> "Active on ${currentNetworkName()} - blocking ${adapter.blockedCount()} app(s)"
             Store.enabled(this) -> "Starting..."
             else -> "Off - flip the switch to start blocking"
         }
@@ -129,6 +157,39 @@ class MainActivity : Activity() {
                 Toast.makeText(this, "VPN permission denied", Toast.LENGTH_SHORT).show()
                 refreshUi()
             }
+        }
+    }
+
+    private fun maybeShowTips() {
+        if (Store.tipsSeen(this)) return
+        Store.setTipsSeen(this, true)
+        AlertDialog.Builder(this)
+            .setTitle("How it works")
+            .setMessage(
+                "This app runs a tiny local VPN on your phone to enforce the blocks:\n\n" +
+                        "\u2022 Switch ON and allow the VPN permission (one time).\n" +
+                        "\u2022 Tap an app's switch to block its internet.\n" +
+                        "\u2022 Long-press an app to block Wi-Fi only or data only.\n" +
+                        "\u2022 'Auto-block new apps' blocks every app you install later.\n" +
+                        "\u2022 Add the 'App Blocker' tile in quick settings for one-tap on/off.\n\n" +
+                        "Nothing leaves your phone - the VPN only drops traffic of blocked apps. " +
+                        "The key icon in the status bar is Android's own VPN indicator."
+            )
+            .setPositiveButton("Got it", null)
+            .show()
+    }
+
+    private fun currentNetworkName(): String {
+        return try {
+            val cm = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+            val caps = cm.getNetworkCapabilities(cm.activeNetwork) ?: return "no network"
+            when {
+                caps.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> "mobile data"
+                caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> "Wi-Fi"
+                else -> "network"
+            }
+        } catch (e: Exception) {
+            "network"
         }
     }
 

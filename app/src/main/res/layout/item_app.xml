@@ -37,8 +37,8 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textSize="12sp"
-            android:textColor="#8A000000"/>
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp"/>
     </LinearLayout>
 
     <Switch

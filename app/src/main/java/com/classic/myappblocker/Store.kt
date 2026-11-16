@@ -25,4 +25,16 @@ object Store {
     fun setEnabled(context: Context, value: Boolean) {
         prefs(context).edit().putBoolean("enabled", value).apply()
     }
+
+    fun blockNewApps(context: Context): Boolean = prefs(context).getBoolean("blockNew", false)
+
+    fun setBlockNewApps(context: Context, value: Boolean) {
+        prefs(context).edit().putBoolean("blockNew", value).apply()
+    }
+
+    fun tipsSeen(context: Context): Boolean = prefs(context).getBoolean("tipsSeen", false)
+
+    fun setTipsSeen(context: Context, value: Boolean) {
+        prefs(context).edit().putBoolean("tipsSeen", value).apply()
+    }
 }

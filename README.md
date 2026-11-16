@@ -49,6 +49,12 @@ git push -u origin main
 - **Per-app switch** — blocks that app's internet (Wi‑Fi **and** data).
 - **Long-press an app** — choose: block Wi‑Fi only / mobile data only / everything / allow.
 - **Search box** — filter the list by name or package.
+- **Block all / Allow all** buttons — bulk control in one tap.
+- **"Blocked only"** switch — show just the blocked apps.
+- **Auto-block new apps** switch — every app you install in the future gets blocked automatically.
+- **Quick Settings tile** — add the "App Blocker" tile (edit your quick settings panel) for one-tap on/off without opening the app.
+- **Auto-start after reboot** — the blocker re-arms itself when the phone restarts.
+- **Dark mode** — follows your phone's dark/light theme automatically.
 - While blocking, the small **key icon** in the status bar (drawn by Android itself) shows the VPN is active — that one can't be removed by any app.
 - The app's own notification is **silent, minimized and hidden from the lockscreen**; on Android 13+ it isn't shown at all.
 

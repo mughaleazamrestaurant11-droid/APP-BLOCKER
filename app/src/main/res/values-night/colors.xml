@@ -1,0 +1,5 @@
+<resources>
+    <color name="text_main">#DEFFFFFF</color>
+    <color name="text_secondary">#8AFFFFFF</color>
+    <color name="status_bg">#2A2A2A</color>
+</resources>

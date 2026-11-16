@@ -20,6 +20,7 @@ class AppAdapter(
     private val all = ArrayList<AppEntry>()
     private val shown = ArrayList<AppEntry>()
     private var query = ""
+    private var blockedOnly = false
 
     fun reload() {
         all.clear()
@@ -50,15 +51,36 @@ class AppAdapter(
         refilter()
     }
 
+    fun setBlockedOnly(b: Boolean) {
+        blockedOnly = b
+        refilter()
+    }
+
+    fun blockAll() {
+        for (e in all) {
+            e.flags = Store.BLOCK_ALL
+            Store.setFlags(activity, e.pkg, e.flags)
+        }
+        refilter()
+    }
+
+    fun allowAll() {
+        for (e in all) {
+            e.flags = 0
+            Store.setFlags(activity, e.pkg, 0)
+        }
+        refilter()
+    }
+
     private fun refilter() {
         shown.clear()
         for (e in all) {
-            if (query.isEmpty() ||
-                e.label.lowercase().contains(query) ||
-                e.pkg.lowercase().contains(query)
-            ) {
-                shown.add(e)
-            }
+            if (blockedOnly && e.flags == 0) continue
+            if (query.isNotEmpty() &&
+                !e.label.lowercase().contains(query) &&
+                !e.pkg.lowercase().contains(query)
+            ) continue
+            shown.add(e)
         }
         notifyDataSetChanged()
     }
