@@ -1,14 +1,11 @@
 package com.classic.myappblocker
 
-import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
 import android.net.VpnService
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -31,12 +28,6 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        if (Build.VERSION.SDK_INT >= 33 &&
-            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
-        ) {
-            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), REQUEST_NOTIFICATIONS)
-        }
 
         master = findViewById(R.id.switch_master)
         status = findViewById(R.id.text_status)
@@ -175,7 +166,6 @@ class MainActivity : Activity() {
 
     companion object {
         private const val REQUEST_VPN = 1
-        private const val REQUEST_NOTIFICATIONS = 2
 
         /** Tell the running service to rebuild its rules after a change. */
         fun refreshVpn(context: Context) {

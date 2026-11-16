@@ -44,8 +44,9 @@ class BlockerVpnService : VpnService() {
         connectivity = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
 
         val channel = NotificationChannel(
-            CHANNEL_ID, "Firewall status", NotificationManager.IMPORTANCE_LOW
+            CHANNEL_ID, "Firewall status", NotificationManager.IMPORTANCE_MIN
         )
+        channel.setShowBadge(false)
         (getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
             .createNotificationChannel(channel)
 
@@ -259,6 +260,9 @@ class BlockerVpnService : VpnService() {
             .setContentText("Blocking internet for selected apps")
             .setContentIntent(open)
             .setOngoing(true)
+            .setShowWhen(false)
+            .setPriority(Notification.PRIORITY_MIN)
+            .setVisibility(Notification.VISIBILITY_SECRET)
             .addAction(
                 Notification.Action.Builder(
                     Icon.createWithResource(this, R.drawable.ic_stat), "Stop", stop

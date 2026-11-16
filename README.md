@@ -40,7 +40,7 @@ git push -u origin main
 1. Copy `app-debug.apk` to your phone (USB, WhatsApp to yourself, Drive, etc.).
 2. Tap it → allow "Install unknown apps" if asked → install.
 3. Open **My App Blocker** and flip the top switch ON.
-4. Android will ask for **VPN permission** → tap **OK**. Also allow the notification permission if asked.
+4. Android will ask for **VPN permission** → tap **OK**. That's the only permission you'll see.
 5. You now see every app that has internet permission. Tap a switch to block it.
 
 ## Using it
@@ -49,7 +49,8 @@ git push -u origin main
 - **Per-app switch** — blocks that app's internet (Wi‑Fi **and** data).
 - **Long-press an app** — choose: block Wi‑Fi only / mobile data only / everything / allow.
 - **Search box** — filter the list by name or package.
-- The notification has a **Stop** button; the key icon in the status bar = VPN active.
+- While blocking, the small **key icon** in the status bar (drawn by Android itself) shows the VPN is active — that one can't be removed by any app.
+- The app's own notification is **silent, minimized and hidden from the lockscreen**; on Android 13+ it isn't shown at all.
 
 ## Important notes
 
