@@ -1,6 +1,11 @@
 # My App Blocker (Kotlin)
 
-A personal Android app that lets you **block the internet connection of any app on your phone** — per app, and separately for Wi‑Fi vs mobile data. No root needed.
+A personal Android app with **two protections in one**:
+
+1. **Internet blocker** — cut the internet connection of any app, separately for Wi‑Fi and mobile data (local VPN, no root).
+2. **Launch Guard (app open blocker)** — apps marked "Opening blocked" are covered with a lock screen whenever they are opened normally; they can only be opened from inside My App Blocker.
+
+Plus: TikTok video downloader (no watermark, via the free public tikwm.com API), fingerprint lock, home-screen widget, quick-settings tile, auto-block new apps, boot auto-start, backup/restore, and a clean multi-page UI (Dashboard / Apps / Settings) with dark mode.
 
 ## How it works
 
@@ -45,19 +50,21 @@ git push -u origin main
 
 ## Using it
 
-- **Top switch** — starts/stops the blocker.
-- **Per-app switch** — blocks that app's internet (Wi‑Fi **and** data).
-- **Long-press an app** — choose: block Wi‑Fi only / mobile data only / everything / allow.
+- **Dashboard** — the big switch starts/stops the internet blocker; two counters show how many apps have internet blocked vs opening blocked.
+- **Apps & blocking page** — per-app **Block** switch (blocks everything), and:
+  - **Long-press an app** to choose: Wi‑Fi only / data only / **opening only** / everything / allow.
+  - **"Open now (1 min bypass)"** appears for opening-blocked apps — the only way to open them normally.
+- **Launch Guard setup** (Settings → Block apps from opening): flip the switch, then enable **"App Blocker Launch Guard"** in the Accessibility settings screen. From then on, blocked apps get covered with a dark "App blocked" screen the moment they open.
 - **Search box** — filter the list by name or package.
 - **Block all / Allow all** buttons — bulk control in one tap.
-- **"Blocked only"** switch — show just the blocked apps.
+- **"Blocked only"** switch — show just the restricted apps.
 - **Auto-block new apps** switch — every app you install in the future gets blocked automatically.
-- **Backup / Restore** buttons — save your blocked list to a JSON file and restore it later (great for switching phones).
+- **Backup / Restore** — save/restore your block list as a JSON file (Settings → Your data).
 - **Fingerprint lock** switch — opening the app requires your fingerprint (fingerprint-only, Android 9+).
-- **TikTok downloader** — paste any TikTok link inside the app and download the video **without watermark** (via the free public tikwm.com API) into `Downloads/MyAppBlocker`.
+- **TikTok downloader** — paste any TikTok link and download the video **without watermark** into `Downloads/MyAppBlocker`.
 - **Home-screen widget** — long-press your launcher → Widgets → "App Blocker" → a one-tap ON/OFF widget.
-- **Quick Settings tile** — add the "App Blocker" tile (edit your quick settings panel) for one-tap on/off without opening the app.
-- **Auto-start after reboot** — the blocker re-arms itself when the phone restarts.
+- **Quick Settings tile** — add the "App Blocker" tile for one-tap on/off without opening the app.
+- **Auto-start after reboot** — the internet blocker re-arms itself when the phone restarts.
 - **Dark mode** — follows your phone's dark/light theme automatically.
 - While blocking, the small **key icon** in the status bar (drawn by Android itself) shows the VPN is active — that one can't be removed by any app.
 - The app's own notification is **silent, minimized and hidden from the lockscreen**; on Android 13+ it isn't shown at all.

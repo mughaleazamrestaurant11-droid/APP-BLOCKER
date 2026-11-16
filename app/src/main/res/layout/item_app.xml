@@ -2,17 +2,21 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginStart="10dp"
+    android:layout_marginEnd="10dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp"
+    android:background="@drawable/bg_card"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingStart="12dp"
-    android:paddingEnd="12dp"
-    android:paddingTop="8dp"
-    android:paddingBottom="8dp">
+    android:padding="10dp">
 
     <ImageView
         android:id="@+id/app_icon"
         android:layout_width="44dp"
         android:layout_height="44dp"
+        android:background="@drawable/bg_icon_tile"
+        android:padding="4dp"
         android:scaleType="fitCenter"/>
 
     <LinearLayout
@@ -28,8 +32,19 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textSize="16sp"
+            android:textColor="@color/text_main"
+            android:textSize="15sp"
             android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/app_state"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="Allowed"
+            android:textColor="@color/text_secondary"
+            android:textSize="11sp"/>
 
         <TextView
             android:id="@+id/app_pkg"
@@ -38,7 +53,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:textColor="@color/text_secondary"
-            android:textSize="12sp"/>
+            android:textSize="11sp"/>
     </LinearLayout>
 
     <Switch
@@ -46,5 +61,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:text="Block"/>
+        android:text="Block"
+        android:textSize="13sp"/>
 </LinearLayout>

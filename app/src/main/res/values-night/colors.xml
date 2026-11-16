@@ -1,5 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="background">#0F131A</color>
+    <color name="card">#1B212B</color>
+    <color name="card_stroke">#2A3240</color>
+    <color name="icon_tile">#22335B</color>
     <color name="text_main">#DEFFFFFF</color>
-    <color name="text_secondary">#8AFFFFFF</color>
-    <color name="status_bg">#2A2A2A</color>
+    <color name="text_secondary">#8AB0BEC9</color>
+    <color name="overlay_bg">#EE0B0F14</color>
 </resources>

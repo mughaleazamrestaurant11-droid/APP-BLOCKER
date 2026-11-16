@@ -11,7 +11,7 @@ import android.widget.ImageView
 import android.widget.Switch
 import android.widget.TextView
 
-/** Adapter that lists every installed app that holds the INTERNET permission. */
+/** Adapter that lists installed apps (launchable and/or internet-capable). */
 class AppAdapter(
     private val activity: Activity,
     private val onChanged: (() -> Unit)? = null
@@ -26,8 +26,9 @@ class AppAdapter(
         all.clear()
         val pm = activity.packageManager
         for (info in pm.getInstalledPackages(PackageManager.GET_PERMISSIONS)) {
-            if (!hasInternetPermission(info)) continue
             if (info.packageName == activity.packageName) continue
+            val launchable = pm.getLaunchIntentForPackage(info.packageName) != null
+            if (!launchable && !hasInternetPermission(info)) continue
             val appInfo = info.applicationInfo ?: continue
             val entry = AppEntry().apply {
                 pkg = info.packageName
@@ -42,7 +43,7 @@ class AppAdapter(
             }
             all.add(entry)
         }
-        all.sortBy { it.label.lowercase() }
+        all.sortWith(compareBy({ it.flags == 0 }, { it.label.lowercase() }))
         refilter()
     }
 
@@ -87,6 +88,10 @@ class AppAdapter(
 
     fun blockedCount(): Int = all.count { it.flags != 0 }
 
+    fun shownCount(): Int = shown.size
+
+    fun totalCount(): Int = all.size
+
     /** Copy of the full list, used for backup export. */
     fun exportAll(): List<AppEntry> = ArrayList(all)
 
@@ -111,6 +116,7 @@ class AppAdapter(
 
         val icon = view.findViewById<ImageView>(R.id.app_icon)
         val label = view.findViewById<TextView>(R.id.app_label)
+        val state = view.findViewById<TextView>(R.id.app_state)
         val pkg = view.findViewById<TextView>(R.id.app_pkg)
         val block = view.findViewById<Switch>(R.id.switch_block)
 
@@ -119,6 +125,10 @@ class AppAdapter(
         )
         label.text = entry.label
         pkg.text = entry.pkg
+        state.text = stateText(entry.flags)
+        state.setTextColor(
+            view.context.getColor(if (entry.flags == 0) R.color.text_secondary else R.color.primary)
+        )
 
         block.setOnCheckedChangeListener(null)
         block.isChecked = entry.flags != 0
@@ -129,5 +139,14 @@ class AppAdapter(
             onChanged?.invoke()
         }
         return view
+    }
+
+    private fun stateText(flags: Int): String {
+        if (flags == 0) return "Allowed"
+        val parts = ArrayList<String>()
+        if (flags and Store.BLOCK_WIFI != 0) parts.add("Wi-Fi")
+        if (flags and Store.BLOCK_DATA != 0) parts.add("Data")
+        if (flags and Store.BLOCK_OPEN != 0) parts.add("Opening")
+        return parts.joinToString(" + ") + " blocked"
     }
 }

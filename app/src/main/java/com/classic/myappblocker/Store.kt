@@ -7,7 +7,9 @@ import android.content.SharedPreferences
 object Store {
     const val BLOCK_WIFI = 1
     const val BLOCK_DATA = 2
-    const val BLOCK_ALL = BLOCK_WIFI or BLOCK_DATA
+    const val BLOCK_OPEN = 4
+    const val BLOCK_INTERNET = BLOCK_WIFI or BLOCK_DATA
+    const val BLOCK_ALL = BLOCK_WIFI or BLOCK_DATA or BLOCK_OPEN
 
     private fun prefs(context: Context): SharedPreferences =
         context.getSharedPreferences("blocker", Context.MODE_PRIVATE)
@@ -42,5 +44,11 @@ object Store {
 
     fun setFingerprintLock(context: Context, value: Boolean) {
         prefs(context).edit().putBoolean("fingerprint", value).apply()
+    }
+
+    fun openGuardEnabled(context: Context): Boolean = prefs(context).getBoolean("openGuard", false)
+
+    fun setOpenGuardEnabled(context: Context, value: Boolean) {
+        prefs(context).edit().putBoolean("openGuard", value).apply()
     }
 }
