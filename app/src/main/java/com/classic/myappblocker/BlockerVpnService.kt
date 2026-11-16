@@ -131,7 +131,7 @@ class BlockerVpnService : VpnService() {
 
         var newTunnel: ParcelFileDescriptor? = null
         try {
-            val builder = VpnService.Builder()
+            val builder = Builder() // VpnService.Builder (inner class of the service)
             builder.setSession(getString(R.string.app_name))
             builder.addAddress("10.111.222.3", 32)
             builder.addAddress("fd75:6d69:6e6a:2e17::3", 128)
