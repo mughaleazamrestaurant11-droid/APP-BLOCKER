@@ -50,7 +50,8 @@ git push -u origin main
   - **Search box** — filter the list by name or package.
   - **Block all / Allow all** buttons — bulk control in one tap.
   - **"Blocked only"** switch — show just the blocked apps.
-- **Blocked cover screen** — shows only **"App blocked"** and the app's name. Tap anywhere or press back to exit straight to the home screen. No buttons, no bypass.
+- **Blocked cover screen** — shows only **"App blocked"** and the app's name. Tap anywhere or press back to exit straight to the home screen. No buttons, no visible bypass.
+- **Secret bypass** — on the blocked cover, **swipe down twice in a row** (two quick full swipes, within 3 seconds) and the app opens for one minute. There's a tiny vibration after each swipe so you know it registered — to anyone else the screen just looks like a dead lock.
 - **Auto-block new apps** switch (Settings) — every app you install in the future gets blocked automatically.
 - **Backup / Restore** — save/restore your block list as a JSON file (Settings → Your data), great when changing phones.
 - **Fingerprint lock** switch — opening this app requires your fingerprint (Android 9+).
