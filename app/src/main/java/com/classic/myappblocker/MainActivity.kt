@@ -10,6 +10,7 @@ import android.net.Uri
 import android.net.VpnService
 import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -276,7 +277,10 @@ class MainActivity : Activity() {
             val prompt = BiometricPrompt.Builder(this)
                 .setTitle("App Blocker locked")
                 .setSubtitle("Use your fingerprint to continue")
-                .setNegativeButtonText("Cancel")
+                .setNegativeButton(
+                    "Cancel", mainExecutor,
+                    DialogInterface.OnClickListener { _, _ -> finish() }
+                )
                 .build()
             locked = true
             prompt.authenticate(CancellationSignal(), mainExecutor, authCallback)
