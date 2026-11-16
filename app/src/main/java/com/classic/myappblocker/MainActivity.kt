@@ -30,6 +30,7 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        Stealth.secure(window)
 
         guard = findViewById(R.id.switch_guard)
         status = findViewById(R.id.text_status)

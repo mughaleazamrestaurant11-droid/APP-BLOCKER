@@ -34,6 +34,7 @@ class TikTokDownloaderActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tiktok)
+        Stealth.secure(window)
         input = findViewById(R.id.input_url)
         status = findViewById(R.id.text_status)
         button = findViewById(R.id.btn_download)

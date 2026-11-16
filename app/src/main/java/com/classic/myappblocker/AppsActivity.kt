@@ -22,6 +22,7 @@ class AppsActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_apps)
+        Stealth.secure(window)
         actionBar?.setDisplayHomeAsUpEnabled(true)
         title = "Apps & blocking"
 

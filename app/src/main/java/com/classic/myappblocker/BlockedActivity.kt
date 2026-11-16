@@ -27,6 +27,7 @@ class BlockedActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_blocked)
+        Stealth.secure(window)
 
         pkg = intent?.getStringExtra(EXTRA_PKG) ?: ""
         findViewById<TextView>(R.id.blocked_name).text = labelFor(pkg)

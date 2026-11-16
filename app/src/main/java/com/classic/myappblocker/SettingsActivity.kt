@@ -22,6 +22,7 @@ class SettingsActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
+        Stealth.secure(window)
         actionBar?.setDisplayHomeAsUpEnabled(true)
         title = "Settings"
 
