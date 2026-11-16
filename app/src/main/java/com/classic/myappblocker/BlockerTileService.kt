@@ -1,5 +1,6 @@
 package com.classic.myappblocker
 
+import android.app.PendingIntent
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
@@ -23,7 +24,13 @@ class BlockerTileService : TileService() {
         if (now && !LaunchGuardService.isServiceEnabled(context)) {
             // The accessibility service must still be enabled by the user.
             try {
-                startSettingsActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                val pi = PendingIntent.getActivity(
+                    this, 0,
+                    Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+                startActivityAndCollapse(pi)
             } catch (e: Exception) {
                 // ignore
             }
