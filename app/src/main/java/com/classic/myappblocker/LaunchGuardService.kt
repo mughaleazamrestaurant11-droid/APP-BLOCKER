@@ -35,9 +35,14 @@ class LaunchGuardService : AccessibilityService() {
         if (pkg == packageName) return
         if (isSystemOverlayPkg(pkg)) return
 
-        // The user left the previously allowed app - forget the bypass.
-        if (allowedPkg != null && pkg != allowedPkg && SystemClock.elapsedRealtime() > graceUntil) {
-            allowedPkg = null
+        // Foreground changed - forget the previous app's bypass and block
+        // memory, so returning to a blocked app is covered again instantly.
+        if (pkg != lastSeenPkg) {
+            lastSeenPkg = pkg
+            if (allowedPkg != null && SystemClock.elapsedRealtime() > graceUntil) {
+                allowedPkg = null
+            }
+            lastBlocked = null
         }
 
         if (!Store.openGuardEnabled(this)) return
@@ -47,12 +52,15 @@ class LaunchGuardService : AccessibilityService() {
         if (pkg == lastBlocked && SystemClock.elapsedRealtime() < lastBlockedUntil) return
 
         lastBlocked = pkg
-        lastBlockedUntil = SystemClock.elapsedRealtime() + 2500
+        lastBlockedUntil = SystemClock.elapsedRealtime() + 500
 
         try {
             val i = Intent(this, BlockedActivity::class.java)
                 .putExtra(BlockedActivity.EXTRA_PKG, pkg)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                .addFlags(
+                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                        Intent.FLAG_ACTIVITY_NO_ANIMATION
+                )
             startActivity(i)
         } catch (e: Exception) {
             // Background activity start refused on this device - app opens normally.
@@ -75,6 +83,7 @@ class LaunchGuardService : AccessibilityService() {
         private var allowedPkg: String? = null
         private var allowedUntil = 0L
         private var graceUntil = 0L
+        private var lastSeenPkg: String? = null
         private var lastBlocked: String? = null
         private var lastBlockedUntil = 0L
 

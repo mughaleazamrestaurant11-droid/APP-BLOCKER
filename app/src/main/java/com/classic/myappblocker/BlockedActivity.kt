@@ -27,6 +27,7 @@ class BlockedActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_blocked)
+        overridePendingTransition(0, 0) // no enter animation - instant cover
         Stealth.secure(window)
 
         pkg = intent?.getStringExtra(EXTRA_PKG) ?: ""
@@ -93,6 +94,7 @@ class BlockedActivity : Activity() {
             // ignore
         }
         finish()
+        overridePendingTransition(0, 0) // no exit animation either
     }
 
     private fun labelFor(pkg: String): String {
