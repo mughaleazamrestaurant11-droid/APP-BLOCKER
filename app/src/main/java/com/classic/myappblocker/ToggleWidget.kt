@@ -30,10 +30,10 @@ class ToggleWidget : AppWidgetProvider() {
         val now = !Store.openGuardEnabled(context)
         Store.setOpenGuardEnabled(context, now)
         if (now && !LaunchGuardService.isServiceEnabled(context)) {
-            // Open the settings screen so the user can enable the service.
+            // Route through the dashboard so the fingerprint lock applies.
             try {
                 context.startActivity(
-                    Intent(context, SettingsActivity::class.java)
+                    Intent(context, MainActivity::class.java)
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 )
             } catch (e: Exception) {

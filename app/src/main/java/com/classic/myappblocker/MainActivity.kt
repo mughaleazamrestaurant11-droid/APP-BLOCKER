@@ -9,6 +9,7 @@ import android.hardware.biometrics.BiometricPrompt
 import android.os.Build
 import android.os.Bundle
 import android.os.CancellationSignal
+import android.os.SystemClock
 import android.view.View
 import android.widget.Switch
 import android.widget.TextView
@@ -22,10 +23,13 @@ class MainActivity : Activity() {
     private lateinit var countOpen: TextView
     private var uiBusy = false
 
+    // Fingerprint re-lock bookkeeping.
+    private var lastPause = 0L
+    private var promptActive = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        maybeLock()
 
         guard = findViewById(R.id.switch_guard)
         status = findViewById(R.id.text_status)
@@ -58,6 +62,13 @@ class MainActivity : Activity() {
     override fun onResume() {
         super.onResume()
         refreshUi()
+        maybeLock()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        lastPause = SystemClock.elapsedRealtime()
+        promptActive = false
     }
 
     private fun refreshUi() {
@@ -85,18 +96,30 @@ class MainActivity : Activity() {
         return n
     }
 
+    /**
+     * Requires the fingerprint on a fresh launch and every time the app comes
+     * back after being in the background. Quick hops inside the app (opening
+     * the Apps/Settings pages and coming back) are exempt so it isn't nagging.
+     */
     private fun maybeLock() {
         if (Build.VERSION.SDK_INT < 28) return
         if (!Store.fingerprintLock(this)) return
-        if (Build.VERSION.SDK_INT >= 30) {
-            val bm = getSystemService(BiometricManager::class.java)
-            if (bm.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK)
-                != BiometricManager.BIOMETRIC_SUCCESS
-            ) {
-                return // no fingerprint enrolled - do not lock the user out
-            }
-        }
+
+        val away = lastPause == 0L ||
+            SystemClock.elapsedRealtime() - lastPause > 1500
+        if (!away || promptActive) return
+
+        val bm = getSystemService(BiometricManager::class.java) ?: return
+        val ready = if (Build.VERSION.SDK_INT >= 30) {
+            bm.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK)
+        } else {
+            @Suppress("DEPRECATION")
+            bm.canAuthenticate()
+        } == BiometricManager.BIOMETRIC_SUCCESS
+        if (!ready) return // no fingerprint enrolled - do not lock the user out
+
         try {
+            promptActive = true
             val prompt = BiometricPrompt.Builder(this)
                 .setTitle("App Blocker locked")
                 .setSubtitle("Use your fingerprint to continue")
@@ -107,16 +130,17 @@ class MainActivity : Activity() {
                 .build()
             prompt.authenticate(CancellationSignal(), mainExecutor, authCallback)
         } catch (e: Exception) {
-            // ignore
+            promptActive = false
         }
     }
 
     private val authCallback = object : BiometricPrompt.AuthenticationCallback() {
         override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult?) {
-            // unlocked
+            promptActive = false
         }
 
         override fun onAuthenticationError(code: Int, errString: CharSequence?) {
+            promptActive = false
             if (code == 5 || code == 10) {
                 finish() // user cancelled
             }
