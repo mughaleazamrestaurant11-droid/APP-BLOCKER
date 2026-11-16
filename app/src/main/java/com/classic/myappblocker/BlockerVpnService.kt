@@ -103,10 +103,10 @@ class BlockerVpnService : VpnService() {
         val wifiActive = isWifiLikeActive()
         val pm = packageManager
 
-        val blockedUids = ArrayList<Int>()
+        val blockedPackages = ArrayList<String>()
         for (info in pm.getInstalledPackages(PackageManager.GET_PERMISSIONS)) {
             if (info.packageName == packageName) continue
-            val appInfo = info.applicationInfo ?: continue
+            if (info.applicationInfo == null) continue
             if (!hasInternetPermission(info)) continue
             val f = Store.flags(this, info.packageName)
             val blockNow = if (wifiActive) {
@@ -114,10 +114,10 @@ class BlockerVpnService : VpnService() {
             } else {
                 (f and Store.BLOCK_DATA) != 0
             }
-            if (blockNow) blockedUids.add(appInfo.uid)
+            if (blockNow) blockedPackages.add(info.packageName)
         }
 
-        if (blockedUids.isEmpty()) {
+        if (blockedPackages.isEmpty()) {
             // Nothing to block on the current network - the VPN is not needed.
             shutdown()
             stopSelf()
@@ -125,7 +125,7 @@ class BlockerVpnService : VpnService() {
         }
 
         // Skip rebuilding when nothing changed (network callbacks fire often).
-        val signature = (if (wifiActive) 1L else 0L) * 31 + blockedUids.hashCode()
+        val signature = (if (wifiActive) 1L else 0L) * 31 + blockedPackages.hashCode()
         if (signature == lastSignature && tunnel != null) return
         lastSignature = signature
 
@@ -138,9 +138,9 @@ class BlockerVpnService : VpnService() {
             builder.addRoute("0.0.0.0", 0)
             builder.addRoute("::", 0)
             builder.setMtu(1500)
-            for (uid in blockedUids) {
+            for (pkgName in blockedPackages) {
                 try {
-                    builder.addAllowedApplication(uid)
+                    builder.addAllowedApplication(pkgName)
                 } catch (e: Exception) {
                     // App may have been uninstalled - skip it.
                 }
