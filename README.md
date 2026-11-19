@@ -9,7 +9,7 @@ A personal Android app that **blocks apps from opening** — with a full-screen 
 1. You mark an app as **blocked** in the Apps page.
 2. An accessibility service ("App Blocker Launch Guard") watches which app comes to the foreground.
 3. The moment a blocked app is opened normally (launcher, recents, another app…), it is covered with a dark **"App blocked"** screen — with **no bypass button on it**.
-4. The only ways to open a blocked app are from inside My App Blocker (Apps page → long-press an app → **Open now**, 1-minute bypass, guarded by the fingerprint lock) or by unblocking the app.
+4. The only ways to open a blocked app are from inside My App Blocker (Apps page → long-press an app → **Open now**, 1-minute bypass, guarded by the fingerprint lock), by touching your fingerprint to the sensor on the blocked cover (1-minute bypass), or by unblocking the app.
 
 No VPN, no root, no special permissions — just the accessibility service you enable once.
 
@@ -50,8 +50,8 @@ git push -u origin main
   - **Search box** — filter the list by name or package.
   - **Block all / Allow all** buttons — bulk control in one tap.
   - **"Blocked only"** switch — show just the blocked apps.
-- **Blocked cover screen** — shows only **"App blocked"** and the app's name. Tap anywhere or press back to exit straight to the home screen. No buttons, no visible bypass.
-- **Secret bypass** — on the blocked cover, **swipe down twice in a row** (two quick full swipes, within 3 seconds) and the app opens for one minute. There's a tiny vibration after each swipe so you know it registered — to anyone else the screen just looks like a dead lock.
+- **Blocked cover screen** — shows only **"App blocked"** and the app's name. Press back to exit straight to the home screen (a quick tap also exits when the phone has no fingerprint set up). No buttons, no visible bypass.
+- **Fingerprint bypass** — on the blocked cover, **touch your finger to the phone's fingerprint sensor** (the same one that unlocks the phone). When the print matches, the app opens for one minute. Nothing pops up on the screen — no dialog, no button — so to anyone else it just looks like a dead lock. A wrong finger gives a tiny vibration so you know to press again, and after a few wrong tries the sensor locks out for a while.
 - **Auto-block new apps** switch (Settings) — every app you install in the future gets blocked automatically.
 - **Backup / Restore** — save/restore your block list as a JSON file (Settings → Your data), great when changing phones.
 - **Fingerprint lock** switch — opening this app requires your fingerprint (Android 9+).
@@ -63,7 +63,7 @@ git push -u origin main
 ## Important notes
 
 - The accessibility service must stay enabled; Android may disable it on some devices after an update — the Settings page shows live **ACTIVE/OFF** status so you can re-enable it.
-- With the fingerprint lock on, the 1-minute "Open now" bypass in the Apps page is safe: nobody can reach it without your finger. The cover screen itself offers no bypass.
+- With the fingerprint lock on, the 1-minute "Open now" bypass in the Apps page is safe: nobody can reach it without your finger. The cover screen itself only opens for your fingerprint — there is no button or gesture on it.
 - Android doesn't let a normal app *prevent* another app from launching — covering it instantly is exactly how commercial AppLock/blocker apps work.
 - The "release" artifact is unsigned and can't be installed directly — use the **debug** APK.
 
